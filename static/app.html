@@ -15,7 +15,7 @@
     $.ajax('/prets', {
       success: function(data){
         for(var pret of data) {
-          pretList.append(`<li>${pret.quoi}</li>`)
+          pretList.append(`<option value='${pret.id}'>${pret.quoi} (${pret.qui})</option>`)
         }
       }
     })
@@ -32,16 +32,53 @@
             $.ajax('/prets', {
 		method: 'POST',                
                 data: data,
-		dataType: "json",
+		contentType: "application/json"
+                 
+            }).done(function(responseData) {
+                console.log(responseData);
+            }).fail(function(){
+	        alert("Something went wrong");
+	    })
+        }
+    })
+
+    $('#modifier').click(function() {
+        var quoi = $('#quoi').val();
+        var qui = $('#qui').val();
+	var statut = $('#statut').val();
+
+        if(quoi === '' || qui === '' || statut === '') {
+            alert('Les champs doivent êtres remplis');
+        } else {
+	    var data = JSON.stringify({"quoi":quoi, "qui":qui, "statut":statut})
+	    var url = '/prets/' + $('#prets option:selected').val()
+            console.log(url)
+            $.ajax(url, {
+		method: 'PUT',                
+                data: data,
 		contentType: "application/json",
                 success: function(responseData) {
                     console.log(responseData);
+		    location.reload()
                 },
 		error: function(){
 		    alert("Something went wrong")
 		}
             })
         }
+    })
+
+    $('#prets').change(function() {
+        text =  $('#prets option:selected').text().split(' ')
+	$('#quoi').text(text[0])
+	text[1] = text[1].replace('(', '')
+	text[1] = text[1].replace(')', '')
+        $('#qui').text(text[1])
+	$('#statut').text('prete')    	
+    })
+
+    $('#actualiser').click(function() {
+        location.reload()
     })
   
   })
@@ -51,10 +88,10 @@
   
   <fieldset>
     <legend>Emprunts en cours</legend>
-    <ul id="prets">
+    <select id="prets" size=10>
       <!-- dynamically generated -->
-    </ul>
-     <button type="button" id="actualiser">Actualiser</button> 
+    </select>
+    <button type="button" id="actualiser">Actualiser</button> 
   </fieldset>
 
   <fieldset>

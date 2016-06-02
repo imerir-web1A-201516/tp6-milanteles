@@ -52,8 +52,9 @@ def prets_add():
 
     db.close()
   
-    resp = make_response("OK", 201)
-    resp.headers['Location'] = '/prets/%d' % last_id
+    resp = make_response("OK", 200)
+    #resp.headers['Location'] = '/prets/%d' % last_id
+    resp.mimetype = 'application/json'
   else:
     resp = make_response("Le prêt n'a pas pu être créé.", 400)
 
@@ -91,10 +92,7 @@ def prets_updateone(id):
       'id': id
     })
     db.close()
-  
-    if len(result) < 1:
-      return make_response("Not found", 404)
-  
+
     resp = make_response("", 204)
     resp.mimetype = 'application/json'
   else:
