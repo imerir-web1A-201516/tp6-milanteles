@@ -36,6 +36,31 @@ def prets_fetchall():
 
 #-----------------------------------------------------------------
 
+@app.route('/prets', methods=['POST'])
+def prets_add():
+  data = request.get_json()
+
+  if (data["statut"] == "prete") or (data["statut"] == "rendu") or (data["statut"] == "annule"):
+    db = Db()
+    db.execute("INSERT INTO prets (quoi, qui, statut) VALUES (%(quoi)s, %(qui)s, %(statut)s)", {
+      'quoi': data["quoi"],
+      'qui': data["qui"],
+      'statut': data["statut"]
+    })
+	
+    last_id =  db.lastrowid()
+
+    db.close()
+  
+    resp = make_response("OK", 201)
+    resp.headers['Location'] = '/prets/%d' % last_id
+  else:
+    resp = make_response("Le prêt n'a pas pu être créé.", 400)
+
+  return resp
+
+#-----------------------------------------------------------------
+
 @app.route('/prets/<int:id>')
 def prets_fetchone(id):
   db = Db()
@@ -49,6 +74,32 @@ def prets_fetchone(id):
   
   resp = make_response(json.dumps(result))
   resp.mimetype = 'application/json'
+  return resp
+
+#-----------------------------------------------------------------
+
+@app.route('/prets/<int:id>', methods=['PUT'])
+def prets_updateone(id):
+  data = request.get_json()
+  
+  if (data["statut"] == "prete") or (data["statut"] == "rendu") or (data["statut"] == "annule"):
+    db = Db()
+    result = db.execute("UPDATE prets SET quoi = %(quoi)s, qui = %(qui)s, statut = %(statut)s WHERE id = %(id)s", {
+      'quoi': data["quoi"],
+      'qui': data["qui"],
+      'statut': data["statut"],
+      'id': id
+    })
+    db.close()
+  
+    if len(result) < 1:
+      return make_response("Not found", 404)
+  
+    resp = make_response("", 204)
+    resp.mimetype = 'application/json'
+  else:
+    resp = make_response("Le prêt n'a pas pu être modifié.", 400)
+
   return resp
 
 #-----------------------------------------------------------------

@@ -34,7 +34,7 @@ class Db:
     return self.cur.rowcount
     
   def lastrowid(self):
-    return self.cur.lastrowid()
+    return self.cur.lastrowid
   
   def fetchall(self, subkeys = None):
     rows  = self.cur.fetchall()

@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS prets;
 CREATE TABLE prets (
-	id SERIAL,
+	id SERIAL PRIMARY KEY,
 	quoi varchar,
 	qui varchar,
 	statut varchar

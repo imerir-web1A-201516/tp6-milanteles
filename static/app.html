@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mon App</title>
+  
+  <script src="jquery.js"></script>
+  
+  <script>
+  $(function(){
+    var pretList = $('#prets')
+    
+    pretList.empty()
+    
+    $.ajax('/prets', {
+      success: function(data){
+        for(var pret of data) {
+          pretList.append(`<li>${pret.quoi}</li>`)
+        }
+      }
+    })
+
+    $('#creer').click(function() {
+        var quoi = $('#quoi').val();
+        var qui = $('#qui').val();
+	var statut = $('#statut').val();
+
+        if(quoi === '' || qui === '' || statut === '') {
+            alert('Les champs doivent êtres remplis');
+        } else {
+	    var data = JSON.stringify({"quoi":quoi, "qui":qui, "statut":statut})
+            $.ajax('/prets', {
+		method: 'POST',                
+                data: data,
+		dataType: "json",
+		contentType: "application/json",
+                success: function(responseData) {
+                    console.log(responseData);
+                },
+		error: function(){
+		    alert("Something went wrong")
+		}
+            })
+        }
+    })
+  
+  })
+  </script>
+</head>
+<body>
+  
+  <fieldset>
+    <legend>Emprunts en cours</legend>
+    <ul id="prets">
+      <!-- dynamically generated -->
+    </ul>
+     <button type="button" id="actualiser">Actualiser</button> 
+  </fieldset>
+
+  <fieldset>
+    <legend>Détail</legend>
+    <form id="form" method="post" action="/prets">
+      <p>Quoi : <input type="text" id="quoi" /></p>
+      <p>Qui : <input type="text" id="qui" /></p>
+      <p>Statut : <input type="text" id="statut" /></p>
+      <p><button type="button" id="creer">Créer comme nouveau prêt</button></p>
+      <p><button type="button" id="modifier">Modifier la sélection</button></p>
+    </form>
+  </fieldset>
+</body>
+</html>
