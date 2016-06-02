@@ -36,5 +36,22 @@ def prets_fetchall():
 
 #-----------------------------------------------------------------
 
+@app.route('/prets/<int:id>')
+def prets_fetchone(id):
+  db = Db()
+  result = db.select("SELECT * FROM prets WHERE id = %(id)s", {
+    'id': id
+  })
+  db.close()
+  
+  if len(result) < 1:
+    return make_response("Not found", 404)
+  
+  resp = make_response(json.dumps(result))
+  resp.mimetype = 'application/json'
+  return resp
+
+#-----------------------------------------------------------------
+
 if __name__ == "__main__":
   app.run()
